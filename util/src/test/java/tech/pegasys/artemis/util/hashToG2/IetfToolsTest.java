@@ -14,13 +14,17 @@
 package tech.pegasys.artemis.util.hashToG2;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static tech.pegasys.artemis.util.hashToG2.IetfTools.HKDF_Expand;
 import static tech.pegasys.artemis.util.hashToG2.IetfTools.HKDF_Extract;
 import static tech.pegasys.artemis.util.hashToG2.IetfTools.HMAC_SHA256;
 
+import java.math.BigInteger;
 import org.apache.tuweni.bytes.Bytes;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class IetfToolsTest {
 
@@ -242,5 +246,27 @@ class IetfToolsTest {
 
     assertEquals(prk, HKDF_Extract(salt, ikm));
     assertEquals(okm, HKDF_Expand(prk, info, l));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "4294967295, 4, 0xFFFFFFFF",
+    "42, 4, 0x0000002A",
+    "46029459550803682895343812821003080589696405386150182061394330539196052371668, 32, 0x65C3C038C95DE45DBFD88F37FCB81F828ABAD41C09B6B1AA493716F2571378D4"
+  })
+  public void i2osp(final String value, final int length, final String expectedResult) {
+    final Bytes i2ospResult = IetfTools.i2osp(new BigInteger(value), length);
+    assertThat(i2ospResult.toHexString()).isEqualTo(expectedResult);
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "0xFFFFFFFF, 4294967295",
+    "0x0000002A, 42",
+    "0x65C3C038C95DE45DBFD88F37FCB81F828ABAD41C09B6B1AA493716F2571378D4, 46029459550803682895343812821003080589696405386150182061394330539196052371668"
+  })
+  public void os2ip(final String value, final String expectedResult) {
+    final BigInteger os2ipResult = IetfTools.os2ip(Bytes.fromHexString(value));
+    assertThat(os2ipResult).isEqualTo(new BigInteger(expectedResult));
   }
 }

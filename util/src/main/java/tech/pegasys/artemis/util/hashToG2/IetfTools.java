@@ -15,7 +15,9 @@ package tech.pegasys.artemis.util.hashToG2;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.math.BigInteger;
 import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.bytes.MutableBytes;
 import org.apache.tuweni.crypto.Hash;
 
 /** A collection of useful IETF standardised tools. */
@@ -98,5 +100,40 @@ public class IetfTools {
       tOld = tNew;
     }
     return okm.slice(0, length);
+  }
+
+  /**
+   * Standard ISOSP as defined at https://tools.ietf.org/html/rfc3447#section-4.1 with support for
+   * BigInteger values.
+   *
+   * @param x
+   * @param xLen
+   * @return
+   */
+  public static Bytes i2osp(final BigInteger x, final int xLen) {
+    final byte[] value = x.toByteArray();
+    final Bytes bytes = Bytes.wrap(value).trimLeadingZeros();
+
+    // Slice max bytes up to xLen but no more as Bytes will fail with an error
+    int maxLength = Math.min(bytes.size(), xLen);
+    final Bytes result = bytes.slice(0, maxLength);
+
+    // include leading zeros
+    final MutableBytes paddedResult = MutableBytes.create(xLen);
+    result.copyTo(paddedResult, xLen - result.size());
+
+    return paddedResult;
+  }
+
+  /**
+   * Standard OS2IP as defined at https://tools.ietf.org/html/rfc3447#section-4.2 with support for
+   * BigInteger values.
+   *
+   * @param value
+   * @return
+   */
+  public static BigInteger os2ip(final Bytes value) {
+    final byte[] magnitude = value.toArray();
+    return new BigInteger(1, magnitude, 0, magnitude.length);
   }
 }
