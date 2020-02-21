@@ -254,7 +254,8 @@ class IetfToolsTest {
     "42, 4, 0x0000002A",
     "46029459550803682895343812821003080589696405386150182061394330539196052371668, 32, 0x65C3C038C95DE45DBFD88F37FCB81F828ABAD41C09B6B1AA493716F2571378D4"
   })
-  public void i2osp(final String value, final int length, final String expectedResult) {
+  public void i2ospConvertsValueToBytesOfSpecifiedLength(
+      final String value, final int length, final String expectedResult) {
     final Bytes i2ospResult = IetfTools.i2osp(new BigInteger(value), length);
     assertThat(i2ospResult.toHexString()).isEqualTo(expectedResult);
   }
@@ -265,7 +266,7 @@ class IetfToolsTest {
     "0x0000002A, 42",
     "0x65C3C038C95DE45DBFD88F37FCB81F828ABAD41C09B6B1AA493716F2571378D4, 46029459550803682895343812821003080589696405386150182061394330539196052371668"
   })
-  public void os2ip(final String value, final String expectedResult) {
+  public void os2ipConvertsBytesToValue(final String value, final String expectedResult) {
     final BigInteger os2ipResult = IetfTools.os2ip(Bytes.fromHexString(value));
     assertThat(os2ipResult).isEqualTo(new BigInteger(expectedResult));
   }

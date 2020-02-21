@@ -106,15 +106,14 @@ public class IetfTools {
    * Standard ISOSP as defined at https://tools.ietf.org/html/rfc3447#section-4.1 with support for
    * BigInteger values.
    *
-   * @param x
-   * @param xLen
-   * @return
+   * @param x nonnegative integer to be converted
+   * @param xLen intended length of the resulting octet
+   * @return a octet string as Bytes with a size xLen
    */
   public static Bytes i2osp(final BigInteger x, final int xLen) {
-    final byte[] value = x.toByteArray();
-    final Bytes bytes = Bytes.wrap(value).trimLeadingZeros();
+    final Bytes bytes = Bytes.wrap(x.toByteArray()).trimLeadingZeros();
 
-    // Slice max bytes up to xLen but no more as Bytes will fail with an error
+    // Slice max bytes up to length but no more as Bytes will fail with an error
     int maxLength = Math.min(bytes.size(), xLen);
     final Bytes result = bytes.slice(0, maxLength);
 
@@ -129,11 +128,11 @@ public class IetfTools {
    * Standard OS2IP as defined at https://tools.ietf.org/html/rfc3447#section-4.2 with support for
    * BigInteger values.
    *
-   * @param value
-   * @return
+   * @param x octet string as bytes to be converted
+   * @return nonnegative integer
    */
-  public static BigInteger os2ip(final Bytes value) {
-    final byte[] magnitude = value.toArray();
+  public static BigInteger os2ip(final Bytes x) {
+    final byte[] magnitude = x.toArray();
     return new BigInteger(1, magnitude, 0, magnitude.length);
   }
 }
